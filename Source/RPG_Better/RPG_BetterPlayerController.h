@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerController.h"
 #include "RPG_BetterPlayerController.generated.h"
 
+struct FInputActionValue;
+class ARPGCameraActor;
 class UNiagaraSystem;
 class UInputMappingContext;
 class UInputAction;
@@ -43,7 +45,14 @@ protected:
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* SetDestinationTouchAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* MiddleMouseDragAction;
 
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* CameraZoomAction;
+
+	
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
 
@@ -61,6 +70,9 @@ public:
 	/** Constructor */
 	ARPG_BetterPlayerController();
 
+	UPROPERTY()
+	ARPGCameraActor*  CameraActor;
+
 protected:
 
 	/** Initialize input bindings */
@@ -72,7 +84,9 @@ protected:
 	void OnSetDestinationReleased();
 	void OnTouchTriggered();
 	void OnTouchReleased();
-
+	void OnMiddleMouseDragTriggered();
+	void OnMiddleMouseDragReleased();
+	void OnCameraZoomTriggered(const FInputActionValue& Value);
 };
 
 

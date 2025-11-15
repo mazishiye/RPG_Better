@@ -9,6 +9,14 @@
 class UCameraComponent;
 class USpringArmComponent;
 
+UENUM()
+enum ECameraMode
+{
+	CameraMode_Free,
+	CameraMode_Follow,
+	CameraMode_MiddleMouseDrag,
+};
+
 UCLASS()
 class RPG_BETTER_API ARPGCameraActor : public AActor
 {
@@ -37,6 +45,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 	float ScrollSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
+	float MouseDragSpeed;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 	float EdgeScrollThreshold;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 	float ZoomSpeed;
@@ -47,7 +57,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 	bool bEnableEdgeScroll;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
-	bool FollowTarget;
+	bool bFollowTarget;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Settings")
 	AActor* Target;
 public:
@@ -58,9 +68,13 @@ public:
 	void HandleMiddleMouseDrag();
 	void StartMiddleMouseDrag();
 	void EndMiddleMouseDrag();
-	
+
+	UPROPERTY()
+	TEnumAsByte<ECameraMode> CameraMode;
 	UPROPERTY()
 	bool bIsMiddleMouseButtonDown;
 	UPROPERTY()
 	FVector2D LastMousePosition;
+	UPROPERTY()
+	APlayerController *PC;
 };
