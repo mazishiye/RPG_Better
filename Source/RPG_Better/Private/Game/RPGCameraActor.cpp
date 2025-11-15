@@ -3,7 +3,6 @@
 
 #include "Game/RPGCameraActor.h"
 
-#include "RPG_BetterPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -21,13 +20,12 @@ ARPGCameraActor::ARPGCameraActor()
 	SpringArm->bDoCollisionTest = false;
 	SpringArm->bEnableCameraLag = true;
 	SpringArm->CameraLagSpeed = 10.f;
-	SpringArm->SetRelativeRotation(FRotator(300.f, 0.f, 0.f));
+	SpringArm->SetRelativeRotation(FRotator(0.f, 280.f, 0.f));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
 	ScrollSpeed = 1000.0f;
-	MouseDragSpeed = 300.f;
 	EdgeScrollThreshold = 50.0f;
 	ZoomSpeed = 100.0f;
 	MinZoomLength = 500.0f;
@@ -40,13 +38,11 @@ ARPGCameraActor::ARPGCameraActor()
 void ARPGCameraActor::BeginPlay()
 {
 	Super::BeginPlay();
-	PC = GetWorld()->GetFirstPlayerController();
-	if (PC)
+
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 	{
 		//PlayerController->SetViewTarget(this);
-		PC->SetViewTargetWithBlend(this, 0.5f);
-		ARPG_BetterPlayerController* RPG_BetterPC = Cast<ARPG_BetterPlayerController>(PC);
-		RPG_BetterPC->CameraActor = this;
+		PlayerController->SetViewTargetWithBlend(this, 0.5f);
 	}
 }
 
@@ -55,25 +51,25 @@ void ARPGCameraActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bIsMiddleMouseButtonDown)
+	if (bEnableEdgeScroll)
 	{
-		HandleMiddleMouseDrag();
+		HandleEdgeScroll();
 		return;
 	}
-	if (bFollowTarget && Target)
+	if (FollowTarget && Target)
 	{
 		SetActorLocation(Target->GetActorLocation());
 		return;
 	}
-	if (bEnableEdgeScroll)
+	if (bIsMiddleMouseButtonDown)
 	{
-		HandleEdgeScroll();
+		HandleMiddleMouseDrag();
 	}
 }
 
 void ARPGCameraActor::HandleEdgeScroll()
 {
-	PC = GetWorld()->GetFirstPlayerController();
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (!PC) return;
 
 	UGameViewportClient* VC = GetWorld()->GetGameViewport();
@@ -115,8 +111,7 @@ void ARPGCameraActor::ZoomOut()
 
 void ARPGCameraActor::HandleMiddleMouseDrag()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("HandleMiddleMouseDrag"))
-	PC = GetWorld()->GetFirstPlayerController();
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (!PC) return;
 
 	FVector2D CurrentMousePosition;
@@ -124,8 +119,8 @@ void ARPGCameraActor::HandleMiddleMouseDrag()
 	{
 		FVector2D Delta = CurrentMousePosition - LastMousePosition;
 		AddActorLocalOffset(FVector(
-			Delta.Y * MouseDragSpeed * GetWorld()->GetDeltaSeconds(),
-			-Delta.X * MouseDragSpeed * GetWorld()->GetDeltaSeconds(),
+			Delta.Y * ScrollSpeed * GetWorld()->GetDeltaSeconds(),
+			-Delta.X * ScrollSpeed * GetWorld()->GetDeltaSeconds(),
 			0.f));
 	}
 	LastMousePosition = CurrentMousePosition;
@@ -133,8 +128,7 @@ void ARPGCameraActor::HandleMiddleMouseDrag()
 
 void ARPGCameraActor::StartMiddleMouseDrag()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("StartMiddleMouseDrag"))
-	PC = GetWorld()->GetFirstPlayerController();
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	if (!PC) return;
 
 	PC->GetMousePosition(LastMousePosition.X, LastMousePosition.Y);
@@ -143,6 +137,5 @@ void ARPGCameraActor::StartMiddleMouseDrag()
 
 void ARPGCameraActor::EndMiddleMouseDrag()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("EndMiddleMouseDrag"))
 	bIsMiddleMouseButtonDown = false;
 }
