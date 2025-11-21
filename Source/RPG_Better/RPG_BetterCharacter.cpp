@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
+#include "GAS/RPGAbilitySystemComponent.h"
 
 ARPG_BetterCharacter::ARPG_BetterCharacter()
 {
@@ -52,6 +53,26 @@ void ARPG_BetterCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// stub
+}
+
+void ARPG_BetterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if(AbilitySystemComponent.IsValid())
+	{
+		AbilitySystemComponent.Get()->BindAbilityActivationToInputComponent(
+			PlayerInputComponent,
+			FGameplayAbilityInputBinds(
+				"Confirm",
+				"Cancel",
+				FTopLevelAssetPath(StaticEnum<EAbilityInputID>()->GetPathName()),
+				static_cast<int32>(EAbilityInputID::Confirm),
+				static_cast<int32>(EAbilityInputID::Cancel)
+				)
+			);
+		
+	}
 }
 
 void ARPG_BetterCharacter::Tick(float DeltaSeconds)

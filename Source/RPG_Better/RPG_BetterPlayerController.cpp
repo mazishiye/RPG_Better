@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "RPG_BetterPlayerController.h"
+
+#include "AbilitySystemComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraSystem.h"
@@ -13,6 +15,7 @@
 #include "Engine/LocalPlayer.h"
 #include "RPG_Better.h"
 #include "Game/RPGCameraActor.h"
+#include "Player/RPGPlayerState.h"
 
 ARPG_BetterPlayerController::ARPG_BetterPlayerController()
 {
@@ -69,6 +72,10 @@ void ARPG_BetterPlayerController::SetupInputComponent()
 			                                   &ARPG_BetterPlayerController::OnTouchReleased);
 			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this,
 			                                   &ARPG_BetterPlayerController::OnTouchReleased);
+
+			//Set up ability input events
+			EnhancedInputComponent->BindAction(AbilityConfirmAction,ETriggerEvent::Started,this,&ARPG_BetterPlayerController::OnConfirmAction);
+			EnhancedInputComponent->BindAction(AbilityCancelAction,ETriggerEvent::Started,this,&ARPG_BetterPlayerController::OnCancelAction);
 		}
 		else
 		{
@@ -77,7 +84,7 @@ void ARPG_BetterPlayerController::SetupInputComponent()
 				       "'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
 			       ), *GetNameSafe(this));
 		}
-	}
+	}	
 }
 
 void ARPG_BetterPlayerController::OnInputStarted()
@@ -164,4 +171,16 @@ void ARPG_BetterPlayerController::OnCameraZoomTriggered(const FInputActionValue&
 	{
 		CameraActor->ZoomIn();
 	}
+}
+
+void ARPG_BetterPlayerController::OnConfirmAction()
+{
+	if(AbilitySystemComponent.IsValid())
+		AbilitySystemComponent.Get()->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Confirm));
+}
+
+void ARPG_BetterPlayerController::OnCancelAction()
+{
+	if(AbilitySystemComponent.IsValid())
+		AbilitySystemComponent.Get()->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Cancel));
 }

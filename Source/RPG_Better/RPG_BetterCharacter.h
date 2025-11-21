@@ -3,14 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/RPGCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "RPG_BetterCharacter.generated.h"
 
+UENUM(BlueprintType)
+enum class EAbilityInputID : uint8
+{
+	None, // 0
+	Confirm, // 用于确认操作
+	Cancel, // 用于取消操作
+	Ability1, // 技能1，例如普通攻击
+	Ability2, // 技能2
+	Ability3, // 技能3
+};
 /**
  *  A controllable top-down perspective character
  */
 UCLASS(abstract)
-class ARPG_BetterCharacter : public ACharacter
+class ARPG_BetterCharacter : public ARPGCharacterBase
 {
 	GENERATED_BODY()
 
@@ -32,6 +43,7 @@ public:
 	/** Initialization */
 	virtual void BeginPlay() override;
 
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	/** Update */
 	virtual void Tick(float DeltaSeconds) override;
 

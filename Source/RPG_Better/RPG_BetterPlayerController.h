@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
+#include "Player/RPGPlayerController.h"
 #include "RPG_BetterPlayerController.generated.h"
 
 struct FInputActionValue;
@@ -13,14 +15,17 @@ class UNiagaraSystem;
 class UInputMappingContext;
 class UInputAction;
 
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+
+
 
 /**
  *  Player controller for a top-down perspective game.
  *  Implements point and click based controls
  */
 UCLASS(abstract)
-class ARPG_BetterPlayerController : public APlayerController
+class ARPG_BetterPlayerController : public ARPGPlayerController
 {
 	GENERATED_BODY()
 
@@ -51,6 +56,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* CameraZoomAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* AbilityConfirmAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* AbilityCancelAction;
 
 	
 	/** True if the controlled character should navigate to the mouse cursor. */
@@ -87,6 +98,11 @@ protected:
 	void OnMiddleMouseDragTriggered();
 	void OnMiddleMouseDragReleased();
 	void OnCameraZoomTriggered(const FInputActionValue& Value);
+
+	void OnConfirmAction( );
+	void OnCancelAction( );
+	
+	
 };
 
 
